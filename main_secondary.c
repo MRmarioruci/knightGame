@@ -8,8 +8,6 @@ typedef struct{
 	/* 0= Cell,1 = Knight,2 = Enemy,3 = Obstacle*/
 	int type;
 	char symbol;
-	int x;//Own x position on array
-	int y;//Own y position on array
 }BoardElement;
 /**	Struct Board represents the Game Board
  *  A GameBoard has an array of BoardElements
@@ -32,7 +30,7 @@ typedef struct{
 
 /*Functions*/
 int calculate_percentage(int x , int y , int percent);
-int init_level(Level* level, int x, int y, char selected_level);
+void init_level(Level* level, int x, int y, char selected_level);
 void end_level(Level* level);
 Board* create_board(int x, int y, int obstacles, int enemies);
 void insert_enemies(Board* board);
@@ -40,10 +38,10 @@ void insert_obstacles(Board* board);
 void insert_knight(Board* board);
 void print(Board* board);
 BoardElement* create_element(int type);
-void moveKnight(char direction);
 
 int main (void)
 {
+	srand(time(NULL));
 	int m,n;
 	char selected_level;
 	printf ("Choose the LINES\n");
@@ -72,23 +70,15 @@ int main (void)
 		Level *gameLevel;//Create new level
 		int x = m + i;//Increase x by 1 every time in order to increase the board size
 		int y = n + i;//Increase y by 1 every time in order to increase the board size
-		int initiated = init_level(gameLevel,x,y,selected_level);//Initiate level
-		if(initiated){
-			while(gameLevel->status != -1){//Run while the level status != 'finished'
-				char nextCommand = '-';
-				while(nextCommand == '-'){
-					printf ("Enter next move\n");
-					scanf(" %c", &nextCommand);
-					moveKnight(nextCommand);
-				}
-				//end_level(gameLevel);
-			}
+		init_level(gameLevel,x,y,selected_level);//Initiate level
+		while(gameLevel->status != -1){//Run while the level status != 'finished'
+			end_level(gameLevel);
 		}
 	}
 	return 0;
 }
 /* Function init_level creates the board and inserts each element on a random position in order for the level to begin */
-int init_level(Level* level, int x, int y, char selected_level){
+void init_level(Level* level, int x, int y, char selected_level){
 	level->status = 1;
 	int obstacle_count, enemy_count,k;
 	char symbol;
@@ -111,7 +101,7 @@ int init_level(Level* level, int x, int y, char selected_level){
            	new_board->board[i][j] = create_element(0);
         }
 	}
-	srand(time(0)); 
+	/* edw edw edw edw edw */ 
 	//Insert enemies in random positions of the board;
 	insert_enemies(new_board);
 	//Insert obstacles in random positions of the board;
@@ -120,8 +110,6 @@ int init_level(Level* level, int x, int y, char selected_level){
 	insert_knight(new_board);
 	/*print the board*/
 	print(new_board);
-
-	return 1;
 }
 
 Board* create_board(int x, int y, int obstacles, int enemies){
@@ -158,6 +146,7 @@ void insert_enemies(Board* board){
 	int randX,randY=0;
 	for (int i = 0; i < board->enemies; i++)
 	{	
+		/*edw edw edw edw edw*/
 		BoardElement* new_enemy = create_element(2);
 		int foundEmptySpace = 0;
 		while(!foundEmptySpace){
@@ -199,8 +188,6 @@ void insert_obstacles(Board* board){
 			BoardElement* tmp_element = board->board[randX][randY];
 			if(board->board[randX][randY]->type == 0){
 				board->board[randX][randY] = new_obstacle;
-				new_obstacle->x = randX;
-				new_obstacle->y = randY;
 				free(tmp_element);
 				foundEmptySpace = 1;
 			}
@@ -216,8 +203,6 @@ void insert_knight(Board* board){
 		BoardElement* tmp_element = board->board[randX][randY];
 		if(board->board[randX][randY]->type == 0){
 			board->board[randX][randY] = knight;
-			knight->x = randX;
-			knight->y = randY;
 			free(tmp_element);
 			foundEmptySpace = 1;
 		}
@@ -235,12 +220,10 @@ void end_level(Level* level){
 	level->status = -1;
 	free(level->current_board);
 }
-void moveKnight(char direction){
-	printf("%c",direction);
-}
 int calculate_percentage(int x , int y , int percent){
 	int total,res;
 	total= x*y;
 	res = total*percent/100;
 	return res;
 }
+	
